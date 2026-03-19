@@ -28,15 +28,24 @@ console.log(result.report);  // { ... }`;
 
 export default function DeveloperAPI() {
   const handleWaitlistClick = () => {
-    const section = document.getElementById('newsletter-section');
-    const input = document.getElementById('newsletter-email');
-    if (section && input) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Wait for scroll to finish before focusing
-      setTimeout(() => {
+    const section = document.getElementById("newsletter-section") as HTMLElement | null;
+    const input = document.getElementById("newsletter-email") as HTMLInputElement | null;
+
+    if (!section) return;
+
+    section.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    setTimeout(() => {
+      if (input) {
         input.focus({ preventScroll: true });
-      }, 800);
-    }
+        return;
+      }
+
+      if (!section.hasAttribute("tabindex")) {
+        section.setAttribute("tabindex", "-1");
+      }
+      section.focus({ preventScroll: true });
+    }, 800);
   };
 
   return (

@@ -10,9 +10,9 @@ import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 const footerLinks = {
   Platform: [
-    { label: "Dashboard", href: "/dashboard" },
+    { label: "Dashboard", href: "https://app.tekverai.com/" },
     { label: "product", href: "/product" },
-    { label: "Admin", href: "/admin" },
+    { label: "Admin", href: "https://app.tekverai.com/" },
   ],
   Explore: [
     { label: "Workflow", href: "/#workflow" },
@@ -651,13 +651,8 @@ export default function Footer() {
         <div className="mb-12 md:mb-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="mb-4 flex items-center gap-2 md:gap-2.5">
-              <div className="flex size-8 md:size-[34px] items-center justify-center rounded-lg bg-[var(--color-accent)]">
-                <ShieldCheck size={16} className="md:w-[18px] md:h-[18px] text-[#020617]" strokeWidth={2.5} />
-              </div>
-              <span className="text-base md:text-[17px] font-[700] text-[var(--color-text-primary)]">
-                Tekver<span className="text-[var(--color-accent)]">AI</span>
-              </span>
+            <Link href="/" className="mb-4 flex items-center gap-2 md:gap-2.5 w-fit">
+              <img src="/LogoNew.png" alt="Logo" className="w-auto h-8 object-center object-cover" />
             </Link>
             <p className="mb-4 md:mb-6 max-w-[220px] text-sm md:text-[14px] leading-[1.6] text-[var(--color-text-secondary)]">
               AI-powered code and system verification for modern software teams.
@@ -703,12 +698,32 @@ export default function Footer() {
                         {link.label}
                       </button>
                     ) : (
-                      <Link
-                        href={link.href}
-                        className="text-sm md:text-[14px] text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]"
-                      >
-                        {link.label}
-                      </Link>
+                      (() => {
+                        const normalizedHref = link.href.startsWith("/http") ? link.href.slice(1) : link.href;
+                        const isExternal = normalizedHref.startsWith("http://") || normalizedHref.startsWith("https://");
+
+                        if (isExternal) {
+                          return (
+                            <a
+                              href={normalizedHref}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm md:text-[14px] text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]"
+                            >
+                              {link.label}
+                            </a>
+                          );
+                        }
+
+                        return (
+                          <Link
+                            href={normalizedHref}
+                            className="text-sm md:text-[14px] text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]"
+                          >
+                            {link.label}
+                          </Link>
+                        );
+                      })()
                     )}
                   </li>
                 ))}

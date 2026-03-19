@@ -68,12 +68,9 @@ export default function Navbar() {
           <div className="flex w-full max-w-[1400px] items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex shrink-0 items-center gap-2 md:gap-2.5 no-underline">
-              <div className="flex size-7 md:size-8 items-center justify-center rounded-lg bg-[var(--color-accent)]">
-                <ShieldCheck size={16} className="md:w-[18px] md:h-[18px] text-[#020617]" strokeWidth={2.5} />
-              </div>
-              <span className="text-base md:text-lg font-[700] tracking-[-0.02em] text-[var(--color-text-primary)]">
-                Tekver<span className="text-[var(--color-accent)]">AI</span>
-              </span>
+              
+              <img src="/LogoNew.png" alt="Logo" className="w-auto h-8 object-center object-cover" />
+           
             </Link>
 
             {/* Desktop Nav - Middle */}

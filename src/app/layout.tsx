@@ -51,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <head>
-        <link rel="icon" href="/favicon.ico" />
+
         <meta name="theme-color" content="#0B0F19" />
       </head>
       <body className={inter.className}>
