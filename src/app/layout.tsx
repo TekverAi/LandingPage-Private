@@ -14,6 +14,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://tekverai.com"),
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
   title: "TekverAI — AI Code & System Verification Platform",
   description:
     "TekverAI is an AI-powered code and system verification platform that automatically detects vulnerabilities, logic errors, and performance risks in your codebase before deployment.",

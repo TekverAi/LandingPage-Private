@@ -2,7 +2,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, ShieldCheck, Twitter, Github, Linkedin, X, FileText, Lock, Globe, Send, Mail, Facebook, Youtube, CheckCircle2, Loader2 } from "lucide-react";
+import { Shield, ShieldCheck, Github, Linkedin, X, FileText, Lock, Globe, Send, Mail, Facebook, Youtube, CheckCircle2, Loader2 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
@@ -660,10 +660,11 @@ export default function Footer() {
             {/* Social links */}
             <div className="flex gap-3">
               {[
-                { icon: Twitter, href: "https://twitter.com/tekverai" },
-                { icon: Facebook, href: "https://facebook.com/tekverai" },
-                { icon: Youtube, href: "https://youtube.com/@tekverai" },
-                { icon: PinterestIcon, href: "https://pinterest.com/tekverai" },
+                { icon: X, href: "https://x.com/TekverAi" },
+                { icon: Linkedin, href: "https://www.linkedin.com/company/tekver-ai/" },
+                { icon: Facebook, href: "https://www.facebook.com/TekverAI" },
+                { icon: Youtube, href: "https://www.youtube.com/@TekverAI" },
+                { icon: PinterestIcon, href: "https://www.pinterest.com/TekverAi/" },
               ].map((social, i) => {
                 const Icon = social.icon;
                 return (

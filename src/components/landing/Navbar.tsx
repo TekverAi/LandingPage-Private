@@ -112,14 +112,14 @@ export default function Navbar() {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <a
-                      href="https://app.tekverai.com/"
+                    <Link
+                      href="/product"
                       className="btn-primary hidden md:flex items-center gap-2 rounded-[30px] px-4 md:px-5 py-2 md:py-2.5 text-xs md:text-[13px]"
-                      target="_blank"
+
                     >
-                      Start Verification
-                      <ChevronRight size={14} className="shrink-0" />
-                    </a>
+                      Tekver Veriscan™
+                      <ChevronRight size={14} className="hidden lg:block shrink-0" />
+                    </Link>
                   </motion.div>
                 )}
               </AnimatePresence>

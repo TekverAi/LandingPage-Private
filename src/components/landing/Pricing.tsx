@@ -178,16 +178,17 @@ function PricingCard({ plan, yearly, index }: {
   const price = yearly ? plan.yearly : plan.monthly;
   const period = "mo";
   const isFeatured = !!plan.badge;
+  const isLargeScreen = typeof window !== "undefined" && window.innerWidth >= 1024;
   const yearlySaving = (plan.monthly - plan.yearly) * 12;
   const checkoutLink = yearly ? plan.yearlyLink : plan.monthlyLink;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: isFeatured ? -14 : 0 }}
+      whileInView={{ opacity: 1, y: isFeatured && isLargeScreen ? -14 : 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: isFeatured ? -18 : -4, transition: { duration: 0.25 } }}
+      whileHover={{ y: isFeatured && isLargeScreen ? -18 : -4, transition: { duration: 0.25 } }}
       className="group relative flex flex-col rounded-2xl overflow-hidden md:p-8"
       style={{
         background: isFeatured
