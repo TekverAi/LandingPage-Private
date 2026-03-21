@@ -316,10 +316,10 @@ export default function GetInTouch() {
               style={{ border: "1px solid rgba(255,255,255,0.07)", boxShadow: "0 16px 40px rgba(0,0,0,0.4)", minHeight: 210 }}>
               <iframe
                 title="TekverAI Office Location"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=-122.4140%2C37.7835%2C-122.3980%2C37.7925&layer=mapnik&marker=37.7880%2C-122.4060"
+                src="https://maps.google.com/maps?q=28%20Geary%20St%2C%20Suite%20650%2C%20San%20Francisco%2C%20CA%2094108%2C%20United%20States&t=&z=15&ie=UTF8&iwloc=&output=embed"
                 width="100%"
                 height="210"
-                style={{ display: "block", border: 0, filter: "invert(0.88) hue-rotate(180deg) brightness(0.82) contrast(0.88)" }}
+                style={{ display: "block", border: 0 }}
                 loading="lazy"
               />
               <a

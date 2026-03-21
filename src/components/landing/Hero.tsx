@@ -23,6 +23,7 @@ export default function Hero() {
 
   return (
     <section
+      id="home"
       onMouseMove={handleMouseMove}
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black px-6 md:px-10 lg:px-12 py-12 md:py-8 lg:py-0"
     >

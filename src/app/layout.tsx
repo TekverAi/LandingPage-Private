@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     shortcut: "/favicon.png",
     apple: "/favicon.png",
   },
-  title: "TekverAI — AI Code & System Verification Platform",
+  title: "TekverAI - AI Code & System Verification Platform",
   description:
     "TekverAI is an AI-powered code and system verification platform that automatically detects vulnerabilities, logic errors, and performance risks in your codebase before deployment.",
   alternates: {

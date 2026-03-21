@@ -67,7 +67,7 @@ const PLANS = [
       "SOC 2 & ISO 27001 reports",
       "Dedicated success manager",
     ],
-    cta: "Contact Sales",
+    cta: "Start Enterprise",
     ctaFilled: false,
     monthlyLink: "https://buy.stripe.com/test_cNi28sgby3h3duU01z0oM03",
     yearlyLink: "https://buy.stripe.com/test_5kQbJ25wUdVH76wg0x0oM00",

@@ -2,7 +2,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, ShieldCheck, Github, Linkedin, X, FileText, Lock, Globe, Send, Mail, Facebook, Youtube, CheckCircle2, Loader2 } from "lucide-react";
+import { Shield, ShieldCheck, Github, Linkedin, FileText, Lock, Globe, Send, Mail, Facebook, Youtube, CheckCircle2, Loader2 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
@@ -10,9 +10,7 @@ import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 const footerLinks = {
   Platform: [
-    { label: "Dashboard", href: "https://app.tekverai.com/" },
-    { label: "product", href: "/product" },
-    { label: "Admin", href: "https://app.tekverai.com/" },
+    { label: "product", href: "/product" }
   ],
   Explore: [
     { label: "Workflow", href: "/#workflow" },
@@ -37,6 +35,21 @@ function PinterestIcon(props: LucideProps) {
       {...rest}
     >
       <path d="M12.017 0C5.396 0 0 5.397 0 12.017c0 5.078 3.158 9.412 7.618 11.169-.103-.949-.19-2.405.04-3.436.205-.874 1.325-5.62 1.325-5.62s-.331-.663-.331-1.644c0-1.54.896-2.69 2.01-2.69.948 0 1.405.711 1.405 1.564 0 .953-.607 2.379-.92 3.702-.262 1.107.558 2.01 1.65 2.01 1.981 0 3.5-2.09 3.5-5.109 0-2.671-1.92-4.538-4.66-4.538-3.174 0-5.037 2.381-5.037 4.842 0 .959.369 1.987.828 2.543.09.11.103.207.076.317l-.307 1.258c-.049.202-.162.245-.373.147-1.391-.647-2.261-2.678-2.261-4.31 0-3.51 2.55-6.733 7.351-6.733 3.859 0 6.858 2.751 6.858 6.427 0 3.834-2.417 6.921-5.77 6.921-1.127 0-2.186-.585-2.548-1.275 0 0-.557 2.122-.693 2.642-.25.962-.924 2.169-1.375 2.9.957.28 1.968.43 3.014.43 6.62 0 12.017-5.397 12.017-12.017S18.636 0 12.017 0z" />
+    </svg>
+  );
+}
+
+function XIcon(props: LucideProps) {
+  const { className, ...rest } = props;
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      stroke="none"
+      className={className}
+      {...rest}
+    >
+      <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.294 19.497h2.039L6.486 3.24H4.298l13.309 17.41z" />
     </svg>
   );
 }
@@ -484,16 +497,6 @@ function LegalModal({ type, onClose }: { type: keyof typeof LEGAL_CONTENT; onClo
           />
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-white/5 bg-white/[0.02] px-8 py-6 flex justify-end">
-          <button
-          title="Ok"
-            onClick={onClose}
-            className="rounded-xl bg-cyan-500 px-6 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 cursor-pointer"
-          >
-            UNDERSTOOD
-          </button>
-        </div>
 
         <style jsx global>{`
           .legal-content h2 {
@@ -660,7 +663,7 @@ export default function Footer() {
             {/* Social links */}
             <div className="flex gap-3">
               {[
-                { icon: X, href: "https://x.com/TekverAi" },
+                { icon: XIcon, href: "https://x.com/TekverAi" },
                 { icon: Linkedin, href: "https://www.linkedin.com/company/tekver-ai/" },
                 { icon: Facebook, href: "https://www.facebook.com/TekverAI" },
                 { icon: Youtube, href: "https://www.youtube.com/@TekverAI" },

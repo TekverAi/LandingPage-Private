@@ -5,41 +5,11 @@ import { motion } from "framer-motion";
 import { Shield, CheckCircle2, Activity, ChevronRight, GitBranch } from "lucide-react";
 import Link from "next/link";
 
-function PremiumLaunchButton() {
-  return (
-    <a href="https://app.tekverai.com/" target="_blank" className="group relative inline-flex items-center gap-2 md:gap-3 px-6 md:px-10 py-3 md:py-4 rounded-xl transition-all duration-500 overflow-hidden">
-      {/* Glassmorphic Background */}
-      <div className="absolute inset-0 bg-[#0F172A]/60 backdrop-blur-xl border border-white/10 group-hover:border-cyan-500/50 transition-colors duration-500" />
-      
-      {/* Inner Glow Overlay */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-cyan-500/10 via-transparent to-cyan-500/10 transition-opacity duration-700" />
 
-      {/* Tech Brackets */}
-      <div className="absolute top-0 left-0 w-2 h-2 md:w-3 md:h-3 border-t border-l border-white/20 group-hover:border-cyan-400 group-hover:w-3 group-hover:h-3 md:group-hover:w-4 md:group-hover:h-4 transition-all duration-500" />
-      <div className="absolute bottom-0 right-0 w-2 h-2 md:w-3 md:h-3 border-b border-r border-white/20 group-hover:border-cyan-400 group-hover:w-3 group-hover:h-3 md:group-hover:w-4 md:group-hover:h-4 transition-all duration-500" />
-
-      {/* Scanning Shimmer */}
-      <motion.div 
-        animate={{ left: ['-100%', '200%'] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-        className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent skew-x-[-25deg] pointer-events-none"
-      />
-
-      {/* Content */}
-      <span className="relative z-10 text-sm md:text-base font-bold text-white tracking-wider group-hover:text-cyan-400 transition-colors duration-300">
-        LAUNCH DASHBOARD
-      </span>
-      <ChevronRight size={16} className="md:w-[18px] md:h-[18px] relative z-10 text-cyan-400 group-hover:translate-x-1.5 transition-transform duration-300" />
-      
-      {/* Underglow on hover */}
-      <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-cyan-400/0 group-hover:bg-cyan-400/40 blur-sm transition-all duration-500" />
-    </a>
-  );
-}
 
 export default function DashboardPreview() {
   return (
-    <section className="relative overflow-hidden bg-[var(--color-bg-primary)] px-4 sm:px-6 md:px-12 py-16 md:py-20 lg:py-24 xl:py-32">
+    <section className="relative overflow-hidden bg-[var(--color-bg-primary)] px-4 sm:px-6 md:px-12 pt-16 md:pt-20 lg:pt-24 xl:pt-32">
       <div className="container-xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -158,11 +128,6 @@ export default function DashboardPreview() {
             </div>
           </div>
         </motion.div>
-
-        {/* CTA below preview */}
-        <div className="mt-12 md:mt-16 lg:mt-20 text-center">
-          <PremiumLaunchButton />
-        </div>
       </div>
     </section>
   );

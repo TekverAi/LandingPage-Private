@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Play, AlertTriangle, CheckCircle2, Info, XCircle, ShieldCheck, X, Code2, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
 
-const PREMIUM_LOCK_MESSAGE = "Live code review is available for Premium plans. Upgrade to continue.";
+
 
 /* ─── Types ──────────────────────────────────────────────────────────────── */
 interface Issue {
@@ -214,6 +214,63 @@ function ResultsPanel({ result }: { result: ReviewResult }) {
   );
 }
 
+function findLine(code: string, pattern: RegExp): number | null {
+  const lines = code.split("\n");
+  for (let i = 0; i < lines.length; i += 1) {
+    if (pattern.test(lines[i])) return i + 1;
+  }
+  return null;
+}
+
+function buildFallbackReview(code: string, language?: string | null): ReviewResult {
+  const issues: Issue[] = [];
+
+  if (/\beval\s*\(/.test(code)) {
+    issues.push({
+      severity: "High",
+      title: "Use of eval()",
+      description: "Dynamic code execution via eval() can introduce remote code execution risks.",
+      line: findLine(code, /\beval\s*\(/),
+    });
+  }
+
+  if (/innerHTML\s*=/.test(code)) {
+    issues.push({
+      severity: "High",
+      title: "Unsafe innerHTML assignment",
+      description: "Directly assigning to innerHTML may enable XSS if content is not sanitized.",
+      line: findLine(code, /innerHTML\s*=/),
+    });
+  }
+
+  if (/(SELECT|UPDATE|DELETE|INSERT)\s+.*\+|`\s*SELECT.*\$\{/.test(code)) {
+    issues.push({
+      severity: "Medium",
+      title: "Possible SQL injection pattern",
+      description: "String interpolation/concatenation in SQL queries should be replaced with parameterized queries.",
+      line: findLine(code, /(SELECT|UPDATE|DELETE|INSERT)/),
+    });
+  }
+
+  const score = Math.max(40, 96 - issues.length * 12);
+  const detectedLanguage = language || detectLanguage(code);
+
+  return {
+    language: detectedLanguage,
+    summary:
+      issues.length > 0
+        ? "Live fallback analysis was used. Potential security and quality issues were detected and should be reviewed manually."
+        : "Live fallback analysis was used. No obvious high-risk patterns were detected in this snippet.",
+    score,
+    issues,
+    recommendations: [
+      "Use parameterized queries for all database operations.",
+      "Store secrets in environment variables or a secrets manager.",
+      "Add input validation and output encoding on untrusted data paths.",
+    ],
+  };
+}
+
 /* ─── Main section ───────────────────────────────────────────────────────── */
 export default function LiveCodeReview() {
   const [code, setCode] = useState("");
@@ -235,10 +292,86 @@ export default function LiveCodeReview() {
     setResult(null);
     setError(null);
 
-    setTimeout(() => {
-      setError(PREMIUM_LOCK_MESSAGE);
+    const apiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
+    if (!apiKey) {
+      setError("Groq API key not configured.");
       setLoading(false);
-    }, 650);
+      return;
+    }
+
+    const systemInstruction = `You are TekverAI, a high-performance code analysis engine.
+Your task is to perform a rigorous review of the provided code for:
+1. Syntax & Logic: Penalize code that won't run or has obvious bugs.
+2. Security: Identify vulnerabilities (XSS, Injection, Hardcoded Secrets, etc.).
+3. Best Practices: Suggest improvements for readability, performance, and maintainability.
+
+Scoring Rubric (Score is out of 100):
+- 90-100: Exceptional, production-ready, no issues.
+- 70-89: Good quality, minor issues or suggestions.
+- 40-69: Significant issues, syntax errors, or security risks.
+- 0-39: Critical vulnerabilities, non-functional code, or highly insecure patterns.
+
+Return a structured JSON response with this exact shape:
+{
+  "language": "<detected language>",
+  "summary": "<comprehensive 2-3 sentence assessment>",
+  "score": <integer 0-100 based on the rubric>,
+  "issues": [
+    {
+      "severity": "High" | "Medium" | "Low" | "Info",
+      "title": "<short descriptive title>",
+      "description": "<detailed impact and fix>",
+      "line": <line number or null>
+    }
+  ],
+  "recommendations": ["<specific actionable recommendation>", "..."]
+}
+Return ONLY the raw JSON object. No commentary outside the JSON.`;
+
+    const userPrompt = detectedLang
+      ? `Review this ${detectedLang} code:\n\n${code}`
+      : `Review this code (auto-detect language):\n\n${code}`;
+
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: systemInstruction },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.2,
+          response_format: { type: "json_object" },
+        }),
+      });
+
+      if (!response.ok) {
+        setResult(buildFallbackReview(code, detectedLang));
+      } else {
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content;
+        if (content) {
+          try {
+            const cleaned = content.replace(/```(?:json)?/gi, "").replace(/```/g, "").trim();
+            setResult(JSON.parse(cleaned));
+          } catch {
+            setResult(buildFallbackReview(code, detectedLang));
+          }
+        } else {
+          setResult(buildFallbackReview(code, detectedLang));
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setResult(buildFallbackReview(code, detectedLang));
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleGoToPricing() {
@@ -433,11 +566,11 @@ export default function LiveCodeReview() {
                   <div className="flex items-center gap-3 mb-3">
                     <XCircle size={18} style={{ color: "#f87171" }} />
                     <span className="text-[14px] font-black text-red-400 uppercase tracking-widest">
-                      {error === PREMIUM_LOCK_MESSAGE ? "Premium Required" : "Audit Failed"}
+                    {error.includes("Premium") ? "Premium Required" : "Audit Failed"}
                     </span>
                   </div>
                   <p className="text-[13px] text-slate-400 leading-relaxed">{error}</p>
-                  {error === PREMIUM_LOCK_MESSAGE && (
+                  {error.includes("Premium") && (
                     <motion.button
                       onClick={handleGoToPricing}
                       whileHover={{ scale: 1.02, y: -1 }}
