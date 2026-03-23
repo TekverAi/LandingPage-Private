@@ -10,8 +10,7 @@ import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 const footerLinks = {
   Platform: [
-    { label: "product", href: "/product" },
-    { label: "Docs (Coming Soon)", href: "#" }
+    { label: "product", href: "/product" }
   ],
   Explore: [
     { label: "Workflow", href: "/#workflow" },
@@ -497,7 +496,6 @@ function LegalModal({ type, onClose }: { type: keyof typeof LEGAL_CONTENT; onClo
             dangerouslySetInnerHTML={{ __html: data.content }}
           />
         </div>
-
 
         <style jsx global>{`
           .legal-content h2 {
