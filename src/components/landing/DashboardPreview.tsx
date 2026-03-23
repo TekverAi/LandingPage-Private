@@ -2,14 +2,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Shield, CheckCircle2, Activity, ChevronRight, GitBranch } from "lucide-react";
-import Link from "next/link";
-
-
+import { Globe } from "lucide-react";
 
 export default function DashboardPreview() {
   return (
-    <section className="relative overflow-hidden bg-[var(--color-bg-primary)] px-4 sm:px-6 md:px-12 pt-16 md:pt-20 lg:pt-24 xl:pt-32">
+    <section className="relative overflow-hidden bg-[var(--color-bg-primary)] px-4 sm:px-6 md:px-12 pt-16 md:pt-20 lg:pt-24 xl:pt-32 pb-20">
       <div className="container-xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -27,105 +24,34 @@ export default function DashboardPreview() {
           </p>
         </motion.div>
 
-        {/* Dashboard Mock */}
+        {/* Browser Frame */}
         <motion.div
           initial={{ opacity: 0, y: 60 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="overflow-hidden rounded-2xl md:rounded-[20px] border border-[var(--color-border-accent)] shadow-[0_30px_80px_rgba(0,0,0,0.6),0_0_40px_rgba(34,211,238,0.05)]"
+          className="overflow-hidden rounded-2xl border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.7),0_0_50px_rgba(34,211,238,0.05)] bg-[#05080f]"
         >
-          {/* Browser chrome */}
-          <div className="flex items-center gap-2 border-b border-[var(--color-border-subtle)] bg-[#0d1424] px-4 md:px-5 py-2.5 md:py-3">
-            <div className="size-2 md:size-2.5 rounded-full bg-[#ef4444]" />
-            <div className="size-2 md:size-2.5 rounded-full bg-[#f59e0b]" />
-            <div className="size-2 md:size-2.5 rounded-full bg-[#22c55e]" />
-            <div className="ml-2 md:ml-3 flex-1 rounded-md bg-white/4 px-3 md:px-3.5 py-1 md:py-1.5 font-mono text-[10px] md:text-xs text-[var(--color-text-muted)]">
-              https://app.tekverai.com/dashboard
+          {/* Browser Chrome */}
+          <div className="flex items-center gap-2 border-b border-white/5 bg-[#0a0f1a] px-4 md:px-5 py-3">
+            <div className="flex gap-1.5">
+              <div className="size-2.5 rounded-full bg-[#ff5f57]" />
+              <div className="size-2.5 rounded-full bg-[#febc2e]" />
+              <div className="size-2.5 rounded-full bg-[#28c840]" />
+            </div>
+            <div className="ml-4 flex-1 rounded-md bg-white/5 px-4 py-1.5 font-mono text-[11px] text-slate-400 flex items-center justify-between">
+              <span>https://app.tekverAi.com/dashboard</span>
+              <Globe size={10} className="opacity-40" />
             </div>
           </div>
 
-          {/* Dashboard content */}
-          <div className="flex min-h-[300px] md:min-h-[400px] bg-[var(--color-bg-secondary)]">
-            {/* Sidebar */}
-            <div className="hidden w-[180px] md:w-[200px] shrink-0 border-r border-[var(--color-border-subtle)] bg-[rgba(11,15,25,0.8)] py-4 md:py-5 sm:block">
-              {[
-                { icon: Activity, label: "Overview", active: true },
-                { icon: GitBranch, label: "Repositories" },
-                { icon: Shield, label: "Security" },
-                { icon: CheckCircle2, label: "Reports" },
-              ].map(({ icon: Icon, label, active }, i) => (
-                <div
-                  key={i}
-                  className={`mx-2 my-0.5 flex cursor-default items-center gap-2 md:gap-2.5 rounded-lg border-l-2 px-3 md:px-4 py-2 md:py-2.5 transition-colors ${active
-                      ? "bg-[rgba(34,211,238,0.1)] border-[var(--color-accent)]"
-                      : "bg-transparent border-transparent"
-                    }`}
-                >
-                  <Icon size={14} className={`md:w-[15px] md:h-[15px] ${active ? "text-[var(--color-accent)]" : "text-[var(--color-text-muted)]"}`} />
-                  <span
-                    className={`text-xs md:text-[13px] ${active ? "font-[600] text-[var(--color-text-primary)]" : "font-[400] text-[var(--color-text-muted)]"
-                      }`}
-                  >
-                    {label}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Main content */}
-            <div className="flex-1 overflow-hidden p-4 md:p-6">
-              {/* Stats row */}
-              <div className="mb-4 md:mb-5 grid grid-cols-3 gap-2 md:gap-3">
-                {[
-                  { label: "Repositories", value: "12", color: "var(--color-accent)" },
-                  { label: "Vulnerabilities", value: "5", color: "var(--color-danger)" },
-                  { label: "Secure Score", value: "87%", color: "var(--color-success)" },
-                ].map((s, i) => (
-                  <div
-                    key={i}
-                    className="rounded-lg md:rounded-[10px] border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-3 md:p-4"
-                  >
-                    <div
-                      className="mb-1 text-lg md:text-xl lg:text-[22px] font-[800]"
-                      style={{ color: s.color }}
-                    >
-                      {s.value}
-                    </div>
-                    <div className="text-[10px] md:text-[11px] text-[var(--color-text-secondary)]">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Activity feed */}
-              <div className="overflow-hidden rounded-xl md:rounded-[12px] border border-[var(--color-border-subtle)] bg-[var(--color-surface)]">
-                <div className="border-b border-[var(--color-border-subtle)] px-3 md:px-4 py-2.5 md:py-3 font-mono text-[10px] md:text-xs font-[600] text-[var(--color-text-secondary)]">
-                   RECENT VERIFICATIONS
-                </div>
-                {[
-                  { repo: "api-gateway", status: "SECURE", time: "2m ago", color: "var(--color-success)" },
-                  { repo: "auth-service", status: "2 ISSUES", time: "15m ago", color: "var(--color-warning)" },
-                  { repo: "payment-core", status: "SCANNING", time: "now", color: "var(--color-accent)" },
-                ].map((r, i) => (
-                  <div
-                    key={i}
-                    className={`flex items-center justify-between px-3 md:px-4 py-2 md:py-2.5 ${i < 2 ? "border-b border-[var(--color-border-subtle)]" : ""
-                      }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <GitBranch size={12} className="md:w-[13px] md:h-[13px] text-[var(--color-text-muted)]" />
-                      <span className="font-mono text-xs md:text-[13px] text-[var(--color-text-primary)]">
-                        {r.repo}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 md:gap-3">
-                      <span className="text-[10px] md:text-[11px] font-[600]" style={{ color: r.color }}>{r.status}</span>
-                      <span className="text-[10px] md:text-[11px] text-[var(--color-text-muted)]">{r.time}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* Image Content */}
+          <div className="relative w-full overflow-hidden bg-[#05080f]">
+            <img 
+              src="/dashboard_preview.PNG" 
+              alt="Tekver AI Dashboard" 
+              className="w-full h-auto block"
+            />
           </div>
         </motion.div>
       </div>

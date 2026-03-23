@@ -139,9 +139,9 @@ export default function GetInTouch() {
           className="text-center mb-16"
         >
           <div className="section-label">GET IN TOUCH</div>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-            Ready to secure <br />
-            <span className="text-cyan-400 uppercase tracking-wider">your infrastructure</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight flex flex-col items-center">
+            <span>Ready to secure</span>
+            <span className="text-cyan-400 uppercase tracking-wider">your codebase</span>
           </h2>
           <p className="text-slate-400 text-base max-w-2xl mx-auto leading-relaxed opacity-80">
             Have a question or want to learn more? Our team of security experts is here to help you secure your modern codebase.
@@ -167,7 +167,7 @@ export default function GetInTouch() {
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               {/* Name + Email row */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
                   type="text" placeholder="Your name" value={form.name} required
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))}

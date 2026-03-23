@@ -49,6 +49,50 @@ function detectLanguage(code: string): string {
   return "Code";
 }
 
+function hasBasicSyntaxErrors(code: string, lang: string): Issue[] {
+  const issues: Issue[] = [];
+  const lines = code.split("\n");
+
+  // 1. Check for basic empty assignments or trailing operators
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (trimmed.endsWith("=") || trimmed.endsWith("+") || trimmed.endsWith("-") || trimmed.endsWith("*") || trimmed.endsWith("/")) {
+      issues.push({
+        severity: "High",
+        title: "Incomplete Statement",
+        description: "A line appears to end prematurely with an operator or assignment.",
+        line: i + 1
+      });
+    }
+  }
+
+  // 2. Mismatched Brackets (Basic check)
+  const openBraces = (code.match(/\{/g) || []).length;
+  const closeBraces = (code.match(/\}/g) || []).length;
+  if (openBraces !== closeBraces) {
+    issues.push({
+      severity: "High",
+      title: "Mismatched Braces",
+      description: `Detected ${openBraces} opening and ${closeBraces} closing braces. Your code is likely missing a closing '}'.`,
+      line: null
+    });
+  }
+
+  // 3. Javascript/TS specific: common syntax mistakes
+  if (lang === "JavaScript" || lang === "TypeScript") {
+    if (/(?:const|let|var)\s+\w+\s*=[\s;]*$/.test(code)) {
+      issues.push({
+        severity: "High",
+        title: "Empty Variable Assignment",
+        description: "Variables must be assigned a value or left uninitialized (if not const).",
+        line: findLine(code, /(?:const|let|var)\s+\w+\s*=[\s;]*$/)
+      });
+    }
+  }
+
+  return issues;
+}
+
 /* ─── Line limit warning modal ───────────────────────────────────────────── */
 function LineWarningModal({ onClose }: { onClose: () => void }) {
   return (
@@ -223,7 +267,8 @@ function findLine(code: string, pattern: RegExp): number | null {
 }
 
 function buildFallbackReview(code: string, language?: string | null): ReviewResult {
-  const issues: Issue[] = [];
+  const detectedLanguage = language || detectLanguage(code);
+  const issues: Issue[] = hasBasicSyntaxErrors(code, detectedLanguage);
 
   if (/\beval\s*\(/.test(code)) {
     issues.push({
@@ -252,21 +297,24 @@ function buildFallbackReview(code: string, language?: string | null): ReviewResu
     });
   }
 
-  const score = Math.max(40, 96 - issues.length * 12);
-  const detectedLanguage = language || detectLanguage(code);
+  // Base score depends on syntax issues first!
+  const hasCritical = issues.some(i => i.severity === "High" && (i.title.includes("Syntax") || i.title.includes("Mismatched") || i.title.includes("Incomplete")));
+  
+  let score = Math.max(30, 96 - (issues.length * 15));
+  if (hasCritical) score = Math.min(score, 35); // Cap score if critical syntax errors
 
   return {
     language: detectedLanguage,
     summary:
       issues.length > 0
-        ? "Live fallback analysis was used. Potential security and quality issues were detected and should be reviewed manually."
+        ? "Potential security, quality, or syntax issues were detected. High-severity flags indicate code that may not execute correctly."
         : "Live fallback analysis was used. No obvious high-risk patterns were detected in this snippet.",
     score,
     issues,
     recommendations: [
+      "Ensure all code blocks are properly closed with matching braces.",
       "Use parameterized queries for all database operations.",
       "Store secrets in environment variables or a secrets manager.",
-      "Add input validation and output encoding on untrusted data paths.",
     ],
   };
 }
@@ -301,7 +349,7 @@ export default function LiveCodeReview() {
 
     const systemInstruction = `You are TekverAI, a high-performance code analysis engine.
 Your task is to perform a rigorous review of the provided code for:
-1. Syntax & Logic: Penalize code that won't run or has obvious bugs.
+1. MANDATORY SYNTAX CHECK: If the code contains syntax errors (unclosed braces, trailing operators, invalid variable declarations), you MUST flag these as "High" severity issues and penalize the score heavily.
 2. Security: Identify vulnerabilities (XSS, Injection, Hardcoded Secrets, etc.).
 3. Best Practices: Suggest improvements for readability, performance, and maintainability.
 
