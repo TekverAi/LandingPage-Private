@@ -8,7 +8,7 @@ import WorkflowSection from "@/components/landing/WorkflowSection";
 import DashboardPreview from "@/components/landing/DashboardPreview";
 import LiveCodeReview from "@/components/landing/LiveCodeReview";
 import ArchitectureDiagram from "@/components/landing/ArchitectureDiagram";
-import DeveloperAPI from "@/components/landing/DeveloperAPI";
+import Usecases from "@/components/landing/Usecases";
 import Pricing from "@/components/landing/Pricing";
 import FAQ from "@/components/landing/FAQ";
 import GetInTouch from "@/components/landing/GetInTouch";
@@ -29,7 +29,7 @@ export default function HomePage() {
         <DashboardPreview />
         <LiveCodeReview />
         <ArchitectureDiagram />
-        <DeveloperAPI />
+        <Usecases />
         
         <Pricing />
         <FAQ />

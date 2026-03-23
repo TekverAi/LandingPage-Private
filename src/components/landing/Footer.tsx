@@ -2,7 +2,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, ShieldCheck, Github, Linkedin, FileText, Lock, Globe, Send, Mail, Facebook, Youtube, CheckCircle2, Loader2 } from "lucide-react";
+import { Shield, ShieldCheck, Github, Linkedin, FileText, Lock, Globe, Send, Mail, Facebook, Youtube, CheckCircle2, Loader2, X } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
@@ -10,7 +10,8 @@ import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 const footerLinks = {
   Platform: [
-    { label: "product", href: "/product" }
+    { label: "product", href: "/product" },
+    { label: "Docs (Coming Soon)", href: "#" }
   ],
   Explore: [
     { label: "Workflow", href: "/#workflow" },

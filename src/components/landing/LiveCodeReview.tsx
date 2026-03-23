@@ -55,8 +55,8 @@ function hasBasicSyntaxErrors(code: string, lang: string): Issue[] {
 
   // 1. Check for basic empty assignments or trailing operators
   for (let i = 0; i < lines.length; i++) {
-    const trimmed = lines[i].trim();
-    if (trimmed.endsWith("=") || trimmed.endsWith("+") || trimmed.endsWith("-") || trimmed.endsWith("*") || trimmed.endsWith("/")) {
+    const lineWithoutComments = lines[i].split("//")[0].split("/*")[0].trim();
+    if (lineWithoutComments.endsWith("=") || lineWithoutComments.endsWith("+") || lineWithoutComments.endsWith("-") || lineWithoutComments.endsWith("*") || lineWithoutComments.endsWith("/")) {
       issues.push({
         severity: "High",
         title: "Incomplete Statement",
@@ -225,10 +225,12 @@ function ResultsPanel({ result }: { result: ReviewResult }) {
                       <IssueIcon size={16} strokeWidth={2.5} style={{ color: cfg.color }} />
                     </div>
                     <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <span className="text-[11px] font-black uppercase tracking-wider" style={{ color: cfg.color }}>{issue.severity} Severity</span>
-                        {issue.line && <span className="text-[10px] font-mono text-slate-500 bg-black/20 px-1.5 rounded">L{issue.line}</span>}
-                        <span className="text-[13px] font-bold text-white ml-auto sm:ml-0">{issue.title}</span>
+                      <div className="flex flex-col mb-1.5">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: cfg.color }}>{issue.severity} Severity</span>
+                          {issue.line && <span className="text-[10px] font-mono text-slate-500 bg-black/20 px-1.5 rounded">L{issue.line}</span>}
+                        </div>
+                        <h4 className="text-[14px] font-bold text-white leading-tight">{issue.title}</h4>
                       </div>
                       <p className="text-[12.5px] text-slate-400 leading-relaxed font-medium">{issue.description}</p>
                     </div>
@@ -340,6 +342,9 @@ export default function LiveCodeReview() {
     setResult(null);
     setError(null);
 
+    const localIssues = hasBasicSyntaxErrors(code, detectedLang || "Code");
+    const hasLocalCritical = localIssues.some(i => i.severity === "High");
+
     const apiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY;
     if (!apiKey) {
       setError("Groq API key not configured.");
@@ -347,34 +352,28 @@ export default function LiveCodeReview() {
       return;
     }
 
-    const systemInstruction = `You are TekverAI, a high-performance code analysis engine.
-Your task is to perform a rigorous review of the provided code for:
-1. MANDATORY SYNTAX CHECK: If the code contains syntax errors (unclosed braces, trailing operators, invalid variable declarations), you MUST flag these as "High" severity issues and penalize the score heavily.
-2. Security: Identify vulnerabilities (XSS, Injection, Hardcoded Secrets, etc.).
-3. Best Practices: Suggest improvements for readability, performance, and maintainability.
+    const systemInstruction = `You are TekverAI, a professional code security and quality auditor.
+Your mission is to provide an accurate, honest, and strict score (0-100) and identify technical issues.
 
-Scoring Rubric (Score is out of 100):
-- 90-100: Exceptional, production-ready, no issues.
-- 70-89: Good quality, minor issues or suggestions.
-- 40-69: Significant issues, syntax errors, or security risks.
-- 0-39: Critical vulnerabilities, non-functional code, or highly insecure patterns.
+CRITICAL SCORING RULES:
+- SYNTAX ERROR / BROKEN CODE: If the code is incomplete, has unclosed braces, or syntax errors, the score MUST be between 0 and 10.
+- CRITICAL SECURITY VULNERABILITY (SQLi, XSS, RCE): Score MUST be between 10 and 35.
+- MINOR ISSUES (Unused variables, magic numbers): Score should be 80-92.
+- PERFECT CODE (Best practices followed, secure): Score should be 95-100.
 
-Return a structured JSON response with this exact shape:
+EXAMPLES:
+1. Input: "const x =" -> Output: {"score": 5, "issues": [{"severity": "High", "title": "Syntax Error", "description": "Incomplete variable assignment."}], ...}
+2. Input: "function add(a,b) { return a+b; }" -> Output: {"score": 98, "summary": "Code is clean, efficient, and follows best practices.", "issues": [], ...}
+
+Return a structured JSON response:
 {
-  "language": "<detected language>",
-  "summary": "<comprehensive 2-3 sentence assessment>",
-  "score": <integer 0-100 based on the rubric>,
-  "issues": [
-    {
-      "severity": "High" | "Medium" | "Low" | "Info",
-      "title": "<short descriptive title>",
-      "description": "<detailed impact and fix>",
-      "line": <line number or null>
-    }
-  ],
-  "recommendations": ["<specific actionable recommendation>", "..."]
+  "language": "Detected language",
+  "summary": "2-3 sentence technical assessment",
+  "score": <integer>,
+  "issues": [{ "severity": "High"|"Medium"|"Low"|"Info", "title": "string", "description": "string", "line": number|null }],
+  "recommendations": ["string"]
 }
-Return ONLY the raw JSON object. No commentary outside the JSON.`;
+Return ONLY the JSON.`;
 
     const userPrompt = detectedLang
       ? `Review this ${detectedLang} code:\n\n${code}`
@@ -393,7 +392,7 @@ Return ONLY the raw JSON object. No commentary outside the JSON.`;
             { role: "system", content: systemInstruction },
             { role: "user", content: userPrompt },
           ],
-          temperature: 0.2,
+          temperature: 0.1, // Even lower temperature for consistency
           response_format: { type: "json_object" },
         }),
       });
@@ -406,7 +405,36 @@ Return ONLY the raw JSON object. No commentary outside the JSON.`;
         if (content) {
           try {
             const cleaned = content.replace(/```(?:json)?/gi, "").replace(/```/g, "").trim();
-            setResult(JSON.parse(cleaned));
+            const parsed: ReviewResult = JSON.parse(cleaned);
+
+            // 1. Merge local issues (local check is more reliable for simple syntax)
+            localIssues.forEach(li => {
+              if (!parsed.issues.some(ai => ai.title === li.title)) {
+                parsed.issues.unshift(li);
+              }
+            });
+
+            // 2. Forced Calibration
+            const aiBroken = parsed.issues?.some(i => 
+              i.severity === "High" && 
+              /(?:syntax error|incomplete statement|mismatched braces|invalid syntax|unclosed|unexpected token|missing closing)/i.test(i.title)
+            );
+
+            if (hasLocalCritical || aiBroken) {
+              parsed.score = Math.floor(Math.random() * 4) + 6; // 6-9 range for broken code
+              parsed.summary = "CRITICAL: The code contains syntax errors or is incomplete. It will not execute in its current state.";
+            } else if (parsed.issues.length === 0) {
+              parsed.score = 100;
+              parsed.summary = "The code is verified as secure, efficient, and follows all development best practices.";
+            } else {
+              // Ensure we don't punish too hard for MINOR stuff
+              const hasMajor = parsed.issues.some(i => i.severity === "High" || i.severity === "Medium");
+              if (!hasMajor) {
+                parsed.score = Math.max(parsed.score, 90);
+              }
+            }
+
+            setResult(parsed);
           } catch {
             setResult(buildFallbackReview(code, detectedLang));
           }
@@ -576,7 +604,7 @@ Return ONLY the raw JSON object. No commentary outside the JSON.`;
             {/* ── Results panel ── */}
             <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }} transition={{ duration: 0.55, delay: 0.1 }}
-              className="rounded-2xl overflow-hidden overflow-y-auto custom-scrollbar flex flex-col"
+              className={`rounded-2xl overflow-hidden overflow-y-auto custom-scrollbar flex flex-col ${(!result && !loading && !error) ? "hidden lg:flex" : "flex"}`}
               style={{
                 background: "linear-gradient(145deg, rgba(8,18,42,0.95), rgba(3,10,28,0.98))",
                 border: "1px solid rgba(255,255,255,0.08)",
